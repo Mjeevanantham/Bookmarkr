@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -38,6 +39,11 @@ const floatingAnimation = {
 };
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black text-white selection:bg-indigo-500/30">
       {/* Animated Background Gradient Orbs */}
@@ -91,27 +97,28 @@ export default function Home() {
       />
 
       {/* Floating Particles */}
-      {[...Array(5)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute z-0 h-2 w-2 rounded-full bg-indigo-400/20"
-          initial={{
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-          }}
-          animate={{
-            y: [null, Math.random() * -100, Math.random() * 100],
-            x: [null, Math.random() * 50 - 25],
-            opacity: [0.2, 0.5, 0.2],
-          }}
-          transition={{
-            duration: 5 + Math.random() * 5,
-            repeat: Infinity,
-            ease: 'easeInOut' as const,
-            delay: i * 0.5,
-          }}
-        />
-      ))}
+      {mounted &&
+        [...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute z-0 h-2 w-2 rounded-full bg-indigo-400/20"
+            initial={{
+              x: Math.random() * window.innerWidth,
+              y: Math.random() * window.innerHeight,
+            }}
+            animate={{
+              y: [null, Math.random() * -100, Math.random() * 100],
+              x: [null, Math.random() * 50 - 25],
+              opacity: [0.2, 0.5, 0.2],
+            }}
+            transition={{
+              duration: 5 + Math.random() * 5,
+              repeat: Infinity,
+              ease: 'easeInOut' as const,
+              delay: i * 0.5,
+            }}
+          />
+        ))}
 
       <motion.div
         variants={containerVariants}
