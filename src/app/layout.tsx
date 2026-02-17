@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   },
   description: APP_DESCRIPTION,
   icons: {
-    icon: '/Bookmarkr_favicon.png',
+    icon: '/favicon.ico',
   },
 };
 
