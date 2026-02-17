@@ -1,9 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
+import { Loader } from '@/components/ui/loader';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
@@ -103,7 +103,7 @@ export default function LoginPage() {
             <div className="absolute inset-0 translate-x-[-200%] bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-shine" />
 
             {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-zinc-600" />
+              <Loader size="sm" className="text-zinc-600" />
             ) : (
               <>
                 <svg
