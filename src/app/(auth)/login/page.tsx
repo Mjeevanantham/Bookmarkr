@@ -27,41 +27,38 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-black selection:bg-indigo-500/30">
-      {/* Background Gradients & Orbs */}
+    <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden px-4 selection:bg-indigo-500/30">
+      {/* Background Gradients */}
       <div className="absolute inset-0 z-0">
         <div className="absolute -left-[10%] -top-[10%] h-[500px] w-[500px] rounded-full bg-purple-600/20 blur-[120px]" />
         <div className="absolute -right-[10%] top-[20%] h-[400px] w-[400px] rounded-full bg-blue-600/20 blur-[100px]" />
         <div className="absolute bottom-[10%] left-[20%] h-[600px] w-[600px] rounded-full bg-indigo-600/10 blur-[120px]" />
       </div>
 
-      {/* Grid Pattern Overlay */}
-      <div className="absolute inset-0 z-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative z-10 w-full max-w-md px-4"
+        className="relative z-10 w-full max-w-md"
       >
-        <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-2xl transition-colors hover:border-white/20">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+        <div className="glass-card group p-8">
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
           <div className="relative flex flex-col items-center text-center">
-            {/* Logo Animation */}
+            {/* Logo */}
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-              className="mb-8 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-0.5 shadow-lg shadow-indigo-500/20"
+              className="mb-8"
             >
-              <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-black/90 text-2xl font-bold text-white">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30">
                 <Image
                   src="/Bookmarkr_favicon.png"
                   alt="Bookmarkr Logo"
-                  width={32}
-                  height={32}
-                  className="h-8 w-8"
+                  width={40}
+                  height={40}
+                  className="h-10 w-10"
                 />
               </div>
             </motion.div>
@@ -69,12 +66,12 @@ export default function LoginPage() {
             <h1 className="mb-2 text-3xl font-bold tracking-tight text-white">
               Welcome back
             </h1>
-            <p className="mb-8 text-zinc-400">Sign in to access your smart bookmarks</p>
+            <p className="mb-8 text-white/60">Sign in to access your smart bookmarks</p>
 
             <button
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="group relative flex w-full items-center justify-center gap-3 rounded-xl bg-white px-4 py-3.5 text-sm font-semibold text-zinc-900 transition-all hover:bg-zinc-100 hover:shadow-lg hover:shadow-indigo-500/10 disabled:cursor-not-allowed disabled:opacity-70"
+              className="group relative flex w-full items-center justify-center gap-3 rounded-xl bg-white px-4 py-3.5 text-sm font-semibold text-zinc-900 transition-all hover:bg-zinc-100 hover:shadow-lg hover:shadow-white/10 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {loading ? (
                 <Loader size="sm" className="text-zinc-600" />
@@ -103,10 +100,10 @@ export default function LoginPage() {
               )}
             </button>
 
-            <div className="mt-8 flex items-center gap-2 text-xs text-zinc-500">
-              <div className="h-px w-8 bg-zinc-800" />
+            <div className="mt-8 flex items-center gap-2 text-xs text-white/40">
+              <div className="h-px w-8 bg-white/20" />
               <span>Smart Bookmark Manager</span>
-              <div className="h-px w-8 bg-zinc-800" />
+              <div className="h-px w-8 bg-white/20" />
             </div>
           </div>
         </div>

@@ -1,0 +1,63 @@
+Debugger listening on ws://127.0.0.1:60107/231ecf73-5cc1-4d72-a8a8-8378b997e527
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+
+> bookmarkr@0.1.0 build
+> next build
+
+Debugger listening on ws://127.0.0.1:60111/bcb43aa0-8761-4dc3-8c45-8a685a022399
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+  ▲ Next.js 14.2.35
+  - Environments: .env
+
+   Creating an optimized production build ...
+Debugger listening on ws://127.0.0.1:60117/ade996ed-add8-47d3-a167-99c297a4cbab
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+Debugger listening on ws://127.0.0.1:60128/251ce505-5e76-4a79-b534-38266a1dc0d7
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+Debugger listening on ws://127.0.0.1:60540/f78edd29-7f87-42b8-9f4b-229bc9a993a4
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Debugger listening on ws://127.0.0.1:63790/43b90dce-ed09-492f-938b-ef2e0b6b9408
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger listening on ws://127.0.0.1:63791/b80ea997-6fc5-4a12-8bbc-174f9381e7da
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+Debugger attached.
+
+Failed to compile.
+
+./src/app/dashboard/page.tsx
+9:1  Error: `framer-motion` import should occur before import of `@/components/layout/app-shell`  import/order
+10:1  Error: `lucide-react` import should occur before import of `@/components/layout/app-shell`  import/order
+11:1  Error: `react` import should occur before import of `@/components/layout/app-shell`  import/order
+
+./src/app/dashboard/settings/page.tsx
+7:1  Error: `framer-motion` import should occur before import of `@/components/layout/app-shell`  import/order
+8:1  Error: `lucide-react` import should occur before import of `@/components/layout/app-shell`  import/order
+9:1  Error: `react` import should occur before import of `@/components/layout/app-shell`  import/order
+
+./src/components/layout/sidebar.tsx
+3:1  Error: `@/lib/supabase/client` import should occur after import of `react`  import/order
+4:1  Error: `@/lib/utils` import should occur after import of `react`  import/order
+
+./src/components/ui/badge.tsx
+2:1  Error: `react` import should occur before import of `@/lib/utils`  import/order
+
+./src/components/ui/button.tsx
+2:1  Error: `react` import should occur before import of `@/lib/utils`  import/order
+
+./src/components/ui/glass-card.tsx
+2:1  Error: `react` import should occur before import of `@/lib/utils`  import/order
+
+./src/components/ui/input.tsx
+2:1  Error: `react` import should occur before import of `@/lib/utils`  import/order
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
