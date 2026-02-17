@@ -1,16 +1,26 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Bookmark, ExternalLink, MoreVertical, Plus, TrendingUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { AppShell } from '@/components/layout/app-shell';
+import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/ui/empty-state';
-import { GlassCard } from '@/components/ui/glass-card';
-import { SkeletonCard } from '@/components/ui/skeleton';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// Mock data - replace with actual Supabase data
 interface BookmarkType {
   id: string;
   title: string;
@@ -18,7 +28,6 @@ interface BookmarkType {
   description: string;
   priority: 'high' | 'medium' | 'low';
   status: 'reading' | 'completed' | 'saved';
-  createdAt: string;
 }
 
 const mockBookmarks: BookmarkType[] = [
@@ -29,7 +38,6 @@ const mockBookmarks: BookmarkType[] = [
     description: 'The official Next.js documentation with guides and API references',
     priority: 'high',
     status: 'reading',
-    createdAt: '2024-02-15',
   },
   {
     id: '2',
@@ -38,16 +46,14 @@ const mockBookmarks: BookmarkType[] = [
     description: 'A utility-first CSS framework for rapid UI development',
     priority: 'medium',
     status: 'completed',
-    createdAt: '2024-02-14',
   },
   {
     id: '3',
-    title: 'Framer Motion',
-    url: 'https://www.framer.com/motion',
-    description: 'Production-ready animation library for React',
+    title: 'shadcn/ui',
+    url: 'https://ui.shadcn.com',
+    description: 'Beautifully designed components built with Radix UI and Tailwind CSS',
     priority: 'low',
     status: 'saved',
-    createdAt: '2024-02-13',
   },
 ];
 
@@ -58,11 +64,9 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    // Load view preference from localStorage
     const savedView = localStorage.getItem('bookmarkView') as 'grid' | 'list' | null;
     if (savedView) setView(savedView);
 
-    // Simulate loading
     setTimeout(() => {
       setBookmarks(mockBookmarks);
       setLoading(false);
@@ -88,106 +92,73 @@ export default function DashboardPage() {
   };
 
   return (
-    <AppShell
+    <DashboardLayout
       currentView={view}
       onViewChange={handleViewChange}
       onSearchChange={setSearchQuery}
+      showViewToggle
     >
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-            <p className="mt-1 text-sm text-white/60">
-              Manage and organize your smart bookmarks
+            <h1 className="text-3xl font-semibold">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">
+              Manage and organize your bookmarks
             </p>
           </div>
           <Button>
-            <Plus className="h-5 w-5" />
+            <Plus className="mr-2 h-4 w-4" />
             Add Bookmark
           </Button>
         </div>
 
         {/* Stats Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <GlassCard hover>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-white/60">Total Bookmarks</p>
-                  <p className="mt-2 text-3xl font-bold text-white">{stats.total}</p>
-                </div>
-                <div className="rounded-full bg-indigo-500/20 p-3">
-                  <Bookmark className="h-6 w-6 text-indigo-400" />
-                </div>
-              </div>
-            </GlassCard>
-          </motion.div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Bookmarks</CardTitle>
+              <Bookmark className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.total}</div>
+            </CardContent>
+          </Card>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <GlassCard hover>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-white/60">High Priority</p>
-                  <p className="mt-2 text-3xl font-bold text-white">
-                    {stats.highPriority}
-                  </p>
-                </div>
-                <div className="rounded-full bg-red-500/20 p-3">
-                  <TrendingUp className="h-6 w-6 text-red-400" />
-                </div>
-              </div>
-            </GlassCard>
-          </motion.div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">High Priority</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.highPriority}</div>
+            </CardContent>
+          </Card>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <GlassCard hover>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-white/60">Reading</p>
-                  <p className="mt-2 text-3xl font-bold text-white">{stats.reading}</p>
-                </div>
-                <div className="rounded-full bg-yellow-500/20 p-3">
-                  <Bookmark className="h-6 w-6 text-yellow-400" />
-                </div>
-              </div>
-            </GlassCard>
-          </motion.div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Reading</CardTitle>
+              <Bookmark className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.reading}</div>
+            </CardContent>
+          </Card>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <GlassCard hover>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-white/60">Completed</p>
-                  <p className="mt-2 text-3xl font-bold text-white">{stats.completed}</p>
-                </div>
-                <div className="rounded-full bg-green-500/20 p-3">
-                  <Bookmark className="h-6 w-6 text-green-400" />
-                </div>
-              </div>
-            </GlassCard>
-          </motion.div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Completed</CardTitle>
+              <Bookmark className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.completed}</div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Bookmarks Section */}
         <div>
-          <h2 className="mb-4 text-xl font-semibold text-white">Your Bookmarks</h2>
+          <h2 className="mb-4 text-xl font-medium">Recent Bookmarks</h2>
 
           {loading ? (
             <div
@@ -196,69 +167,83 @@ export default function DashboardPage() {
               }
             >
               {[1, 2, 3].map((i) => (
-                <SkeletonCard key={i} />
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-5 w-3/4" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="mb-2 h-4 w-full" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </CardContent>
+                </Card>
               ))}
             </div>
           ) : filteredBookmarks.length === 0 ? (
-            <GlassCard>
-              <EmptyState
-                title="No bookmarks yet"
-                description="Start organizing your web content by adding your first bookmark"
-                action={
-                  <Button>
-                    <Plus className="h-5 w-5" />
-                    Add Your First Bookmark
-                  </Button>
-                }
-              />
-            </GlassCard>
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <Bookmark className="mb-4 h-12 w-12 text-muted-foreground" />
+                <h3 className="mb-2 text-lg font-medium">No bookmarks yet</h3>
+                <p className="mb-4 text-sm text-muted-foreground">
+                  Start organizing your web content by adding your first bookmark
+                </p>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Your First Bookmark
+                </Button>
+              </CardContent>
+            </Card>
           ) : (
             <div
               className={
                 view === 'grid' ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3' : 'space-y-4'
               }
             >
-              {filteredBookmarks.map((bookmark, index) => (
-                <motion.div
-                  key={bookmark.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <GlassCard hover className="group relative">
+              {filteredBookmarks.map((bookmark) => (
+                <Card key={bookmark.id} className="transition-shadow hover:shadow-md">
+                  <CardHeader>
                     <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="mb-2 font-semibold text-white transition-colors group-hover:text-indigo-400">
-                          {bookmark.title}
-                        </h3>
-                        <p className="mb-3 line-clamp-2 text-sm text-white/60">
-                          {bookmark.description}
-                        </p>
-                        <a
-                          href={bookmark.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mb-4 flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          {new URL(bookmark.url).hostname}
-                        </a>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Badge variant={bookmark.priority}>{bookmark.priority}</Badge>
-                          <Badge variant="default">{bookmark.status}</Badge>
-                        </div>
-                      </div>
-                      <button className="rounded-lg p-1 text-white/60 transition-colors hover:bg-white/10 hover:text-white">
-                        <MoreVertical className="h-5 w-5" />
-                      </button>
+                      <CardTitle className="text-base">{bookmark.title}</CardTitle>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem>Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
-                  </GlassCard>
-                </motion.div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="line-clamp-2">
+                      {bookmark.description}
+                    </CardDescription>
+                    <a
+                      href={bookmark.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 flex items-center gap-1 text-xs text-primary hover:underline"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      {new URL(bookmark.url).hostname}
+                    </a>
+                  </CardContent>
+                  <CardFooter className="gap-2">
+                    <Badge
+                      variant={bookmark.priority === 'high' ? 'destructive' : 'secondary'}
+                    >
+                      {bookmark.priority}
+                    </Badge>
+                    <Badge variant="outline">{bookmark.status}</Badge>
+                  </CardFooter>
+                </Card>
               ))}
             </div>
           )}
         </div>
       </div>
-    </AppShell>
+    </DashboardLayout>
   );
 }

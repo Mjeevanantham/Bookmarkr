@@ -1,15 +1,25 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { ExternalLink, MoreVertical, Plus } from 'lucide-react';
+import { Bookmark, ExternalLink, MoreVertical, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { AppShell } from '@/components/layout/app-shell';
+import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { EmptyState } from '@/components/ui/empty-state';
-import { GlassCard } from '@/components/ui/glass-card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-// This will be replaced with actual Supabase data
 const mockBookmarks = [
   {
     id: '1',
@@ -27,6 +37,14 @@ const mockBookmarks = [
     priority: 'medium' as const,
     status: 'completed' as const,
   },
+  {
+    id: '3',
+    title: 'shadcn/ui',
+    url: 'https://ui.shadcn.com',
+    description: 'Beautifully designed components built with Radix UI and Tailwind CSS',
+    priority: 'low' as const,
+    status: 'saved' as const,
+  },
 ];
 
 export default function BookmarksPage() {
@@ -41,89 +59,100 @@ export default function BookmarksPage() {
   );
 
   return (
-    <AppShell currentView={view} onViewChange={setView} onSearchChange={setSearchQuery}>
-      <div className="space-y-6">
+    <DashboardLayout
+      currentView={view}
+      onViewChange={setView}
+      onSearchChange={setSearchQuery}
+      showViewToggle
+    >
+      <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">All Bookmarks</h1>
-            <p className="mt-1 text-sm text-white/60">
+            <h1 className="text-3xl font-semibold">All Bookmarks</h1>
+            <p className="text-sm text-muted-foreground">
               {filteredBookmarks.length} bookmark
               {filteredBookmarks.length !== 1 ? 's' : ''} found
             </p>
           </div>
           <Button>
-            <Plus className="h-5 w-5" />
+            <Plus className="mr-2 h-4 w-4" />
             Add Bookmark
           </Button>
         </div>
 
         {/* Bookmarks */}
         {filteredBookmarks.length === 0 ? (
-          <GlassCard>
-            <EmptyState
-              title="No bookmarks found"
-              description={
-                searchQuery
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <Bookmark className="mb-4 h-12 w-12 text-muted-foreground" />
+              <h3 className="mb-2 text-lg font-medium">
+                {searchQuery ? 'No bookmarks found' : 'No bookmarks yet'}
+              </h3>
+              <p className="mb-4 text-sm text-muted-foreground">
+                {searchQuery
                   ? 'Try adjusting your search query'
-                  : 'Start organizing your web content by adding your first bookmark'
-              }
-              action={
-                !searchQuery && (
-                  <Button>
-                    <Plus className="h-5 w-5" />
-                    Add Your First Bookmark
-                  </Button>
-                )
-              }
-            />
-          </GlassCard>
+                  : 'Start organizing your web content by adding your first bookmark'}
+              </p>
+              {!searchQuery && (
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Your First Bookmark
+                </Button>
+              )}
+            </CardContent>
+          </Card>
         ) : (
           <div
             className={
               view === 'grid' ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3' : 'space-y-4'
             }
           >
-            {filteredBookmarks.map((bookmark, index) => (
-              <motion.div
-                key={bookmark.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <GlassCard hover className="group relative">
+            {filteredBookmarks.map((bookmark) => (
+              <Card key={bookmark.id} className="transition-shadow hover:shadow-md">
+                <CardHeader>
                   <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="mb-2 font-semibold text-white transition-colors group-hover:text-indigo-400">
-                        {bookmark.title}
-                      </h3>
-                      <p className="mb-3 line-clamp-2 text-sm text-white/60">
-                        {bookmark.description}
-                      </p>
-                      <a
-                        href={bookmark.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mb-4 flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300"
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                        {new URL(bookmark.url).hostname}
-                      </a>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant={bookmark.priority}>{bookmark.priority}</Badge>
-                        <Badge variant="default">{bookmark.status}</Badge>
-                      </div>
-                    </div>
-                    <button className="rounded-lg p-1 text-white/60 transition-colors hover:bg-white/10 hover:text-white">
-                      <MoreVertical className="h-5 w-5" />
-                    </button>
+                    <CardTitle className="text-base">{bookmark.title}</CardTitle>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuItem>Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                </GlassCard>
-              </motion.div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="line-clamp-2">
+                    {bookmark.description}
+                  </CardDescription>
+                  <a
+                    href={bookmark.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 flex items-center gap-1 text-xs text-primary hover:underline"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    {new URL(bookmark.url).hostname}
+                  </a>
+                </CardContent>
+                <CardFooter className="gap-2">
+                  <Badge
+                    variant={bookmark.priority === 'high' ? 'destructive' : 'secondary'}
+                  >
+                    {bookmark.priority}
+                  </Badge>
+                  <Badge variant="outline">{bookmark.status}</Badge>
+                </CardFooter>
+              </Card>
             ))}
           </div>
         )}
       </div>
-    </AppShell>
+    </DashboardLayout>
   );
 }

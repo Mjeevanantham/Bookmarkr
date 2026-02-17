@@ -1,8 +1,10 @@
 import { Inter } from 'next/font/google';
+
+import { Toaster } from '@/components/ui/toaster';
 import { APP_DESCRIPTION, APP_NAME } from '@/lib/constants';
 import { cn } from '@/lib/utils';
-import '@/styles/globals.css';
 import type { Metadata } from 'next';
+import '@/styles/globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -28,6 +30,7 @@ export default function RootLayout({
         className={cn('min-h-screen bg-background font-sans antialiased', inter.variable)}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );

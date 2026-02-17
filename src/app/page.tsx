@@ -1,172 +1,123 @@
-'use client';
-
-import { motion } from 'framer-motion';
 import { Bookmark, Search, Sparkles, Zap } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { y: 30, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      type: 'spring' as const,
-      stiffness: 100,
-      damping: 12,
-    },
-  },
-};
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 const features = [
   {
     icon: Sparkles,
-    title: 'AI-Powered',
-    description: 'Smart organization using local AI processing',
+    title: 'AI-Powered Organization',
+    description:
+      'Automatically categorize and tag your bookmarks using local AI processing.',
   },
   {
     icon: Search,
-    title: 'Fast Search',
-    description: 'Find any bookmark instantly with semantic search',
+    title: 'Semantic Search',
+    description:
+      'Find any bookmark instantly with intelligent search that understands context.',
   },
   {
     icon: Zap,
     title: 'Lightning Fast',
-    description: 'Built for speed with modern web technologies',
+    description:
+      'Built with modern web technologies for instant loading and smooth interactions.',
   },
   {
     icon: Bookmark,
     title: 'Privacy First',
-    description: 'Your data stays yours with local-first architecture',
+    description: 'Your data stays yours. All processing happens locally on your device.',
   },
 ];
 
 export default function Home() {
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 selection:bg-indigo-500/30">
-      {/* Animated Background Gradient Orbs */}
-      <div className="absolute inset-0 z-0">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: 'easeInOut' as const,
-          }}
-          className="absolute left-[10%] top-[15%] h-[500px] w-[500px] rounded-full bg-purple-600/40 blur-[120px]"
-        />
-        <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.3, 0.6, 0.3],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: 'easeInOut' as const,
-            delay: 1,
-          }}
-          className="absolute bottom-[15%] right-[10%] h-[500px] w-[500px] rounded-full bg-indigo-600/40 blur-[120px]"
-        />
-      </div>
-
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="relative z-10 flex max-w-5xl flex-col items-center text-center"
-      >
-        {/* Logo */}
-        <motion.div variants={itemVariants} className="mb-8">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30">
-            <Image
-              src="/Bookmarkr_favicon.png"
-              alt="Bookmarkr Logo"
-              width={40}
-              height={40}
-              className="h-10 w-10"
-              priority
-            />
+    <div className="flex min-h-screen flex-col">
+      {/* Navigation */}
+      <header className="border-b">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+          <div className="flex items-center gap-2">
+            <Bookmark className="h-6 w-6" />
+            <span className="text-xl font-semibold">Bookmarkr</span>
           </div>
-        </motion.div>
+          <nav className="flex items-center gap-6">
+            <Link href="/login">
+              <Button variant="ghost">Sign In</Button>
+            </Link>
+            <Link href="/login">
+              <Button>Get Started</Button>
+            </Link>
+          </nav>
+        </div>
+      </header>
 
-        {/* Hero Text */}
-        <motion.h1
-          variants={itemVariants}
-          className="mb-6 text-5xl font-bold sm:text-6xl lg:text-7xl"
-        >
-          <span className="bg-gradient-to-br from-white via-white to-white/80 bg-clip-text text-transparent">
+      {/* Hero Section */}
+      <section className="flex flex-1 items-center">
+        <div className="mx-auto max-w-7xl px-6 py-24 text-center">
+          <h1 className="mb-6 text-5xl font-semibold tracking-tight sm:text-6xl">
             Your bookmarks,
-          </span>
-          <br />
-          <span className="text-gradient">reimagined with AI.</span>
-        </motion.h1>
+            <br />
+            <span className="text-muted-foreground">organized intelligently.</span>
+          </h1>
+          <p className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground">
+            Stop losing track of important links. Bookmarkr uses local-first AI to help
+            you organize, search, and rediscover your saved content.
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <Link href="/login">
+              <Button size="lg">Start Free</Button>
+            </Link>
+            <Button size="lg" variant="outline">
+              Learn More
+            </Button>
+          </div>
+        </div>
+      </section>
 
-        <motion.p
-          variants={itemVariants}
-          className="mb-10 max-w-2xl text-lg text-white/70 sm:text-xl"
-        >
-          Organize, search, and discover your saved content like never before using{' '}
-          <span className="font-semibold text-indigo-300">local-first</span> AI
-          processing.
-        </motion.p>
+      {/* Features */}
+      <section className="border-t bg-muted/50 py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-3xl font-semibold">Everything you need</h2>
+            <p className="text-muted-foreground">
+              Powerful features to manage your bookmarks efficiently
+            </p>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {features.map((feature) => (
+              <Card key={feature.title}>
+                <CardHeader>
+                  <feature.icon className="mb-2 h-10 w-10" />
+                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>{feature.description}</CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
 
-        {/* CTA Button */}
-        <motion.div variants={itemVariants} className="mb-16">
-          <Link href="/login" className="btn-primary text-lg">
-            Get Started
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M13 7l5 5m0 0l-5 5m5-5H6"
-              />
-            </svg>
-          </Link>
-        </motion.div>
-
-        {/* Feature Highlights */}
-        <motion.div
-          variants={itemVariants}
-          className="grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 + index * 0.1 }}
-              className="glass-card group p-6 text-center transition-transform hover:scale-105"
-            >
-              <div className="mb-4 inline-flex rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 p-3">
-                <feature.icon className="h-6 w-6 text-indigo-400" />
-              </div>
-              <h3 className="mb-2 font-semibold text-white">{feature.title}</h3>
-              <p className="text-sm text-white/60">{feature.description}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </motion.div>
-    </main>
+      {/* Footer */}
+      <footer className="border-t py-12">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bookmark className="h-5 w-5" />
+              <span className="font-medium">Bookmarkr</span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              © 2026 Bookmarkr. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }
