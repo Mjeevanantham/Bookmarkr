@@ -23,6 +23,15 @@ const config: Config = {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
       },
+      animation: {
+        shine: 'shine 1s',
+      },
+      keyframes: {
+        shine: {
+          '0%': { transform: 'translateX(-100%) skewX(-12deg)' },
+          '100%': { transform: 'translateX(200%) skewX(-12deg)' },
+        },
+      },
     },
   },
   plugins: [],
