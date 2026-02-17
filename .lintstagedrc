@@ -3,7 +3,5 @@
     "eslint --fix --no-error-on-unmatched-pattern",
     "prettier --write"
   ],
-  "*.{json,css,md}": [
-    "prettier --write"
-  ]
+  "*.{json,css,md}": ["prettier --write"]
 }
