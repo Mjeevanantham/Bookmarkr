@@ -1,101 +1,80 @@
 'use client';
 
-import { Bookmark, ExternalLink, MoreVertical, Plus, TrendingUp } from 'lucide-react';
+import { AlertCircle, Bookmark, TrendingUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+import { AddBookmarkDialog } from '@/components/bookmarks/add-bookmark-dialog';
+import { BookmarkCard } from '@/components/bookmarks/bookmark-card';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useBookmarks } from '@/hooks/use-bookmarks';
 
-interface BookmarkType {
-  id: string;
+function StatCard({
+  title,
+  value,
+  icon: Icon,
+  loading,
+}: {
   title: string;
-  url: string;
-  description: string;
-  priority: 'high' | 'medium' | 'low';
-  status: 'reading' | 'completed' | 'saved';
+  value: number;
+  icon: React.ElementType;
+  loading: boolean;
+}) {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        {loading ? (
+          <Skeleton className="h-8 w-16" />
+        ) : (
+          <div className="text-2xl font-bold">{value}</div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
-
-const mockBookmarks: BookmarkType[] = [
-  {
-    id: '1',
-    title: 'Next.js Documentation',
-    url: 'https://nextjs.org/docs',
-    description: 'The official Next.js documentation with guides and API references',
-    priority: 'high',
-    status: 'reading',
-  },
-  {
-    id: '2',
-    title: 'Tailwind CSS',
-    url: 'https://tailwindcss.com',
-    description: 'A utility-first CSS framework for rapid UI development',
-    priority: 'medium',
-    status: 'completed',
-  },
-  {
-    id: '3',
-    title: 'shadcn/ui',
-    url: 'https://ui.shadcn.com',
-    description: 'Beautifully designed components built with Radix UI and Tailwind CSS',
-    priority: 'low',
-    status: 'saved',
-  },
-];
 
 export default function DashboardPage() {
   const [view, setView] = useState<'grid' | 'list'>('grid');
-  const [bookmarks, setBookmarks] = useState<BookmarkType[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    const savedView = localStorage.getItem('bookmarkView') as 'grid' | 'list' | null;
-    if (savedView) setView(savedView);
+  const {
+    bookmarks,
+    stats,
+    loading,
+    error,
+    addBookmark,
+    editBookmark,
+    removeBookmark,
+    setFilters,
+  } = useBookmarks();
 
-    setTimeout(() => {
-      setBookmarks(mockBookmarks);
-      setLoading(false);
-    }, 1000);
+  // Persist view preference
+  useEffect(() => {
+    const saved = localStorage.getItem('bookmarkView') as 'grid' | 'list' | null;
+    if (saved) setView(saved);
   }, []);
 
-  const handleViewChange = (newView: 'grid' | 'list') => {
-    setView(newView);
-    localStorage.setItem('bookmarkView', newView);
+  const handleViewChange = (v: 'grid' | 'list') => {
+    setView(v);
+    localStorage.setItem('bookmarkView', v);
   };
 
-  const filteredBookmarks = bookmarks.filter(
-    (bookmark) =>
-      bookmark.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      bookmark.description.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  const stats = {
-    total: bookmarks.length,
-    highPriority: bookmarks.filter((b) => b.priority === 'high').length,
-    reading: bookmarks.filter((b) => b.status === 'reading').length,
-    completed: bookmarks.filter((b) => b.status === 'completed').length,
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    setFilters({ search: query || undefined });
   };
 
   return (
     <DashboardLayout
       currentView={view}
       onViewChange={handleViewChange}
-      onSearchChange={setSearchQuery}
+      onSearchChange={handleSearchChange}
       showViewToggle
     >
       <div className="space-y-8">
@@ -107,58 +86,50 @@ export default function DashboardPage() {
               Manage and organize your bookmarks
             </p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Bookmark
-          </Button>
+          <AddBookmarkDialog onAdd={addBookmark} />
         </div>
+
+        {/* Error */}
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         {/* Stats Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Bookmarks</CardTitle>
-              <Bookmark className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">High Priority</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.highPriority}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Reading</CardTitle>
-              <Bookmark className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.reading}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed</CardTitle>
-              <Bookmark className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.completed}</div>
-            </CardContent>
-          </Card>
+          <StatCard
+            title="Total Bookmarks"
+            value={stats.total}
+            icon={Bookmark}
+            loading={loading}
+          />
+          <StatCard
+            title="High Priority"
+            value={stats.highPriority}
+            icon={TrendingUp}
+            loading={loading}
+          />
+          <StatCard
+            title="Reading"
+            value={stats.reading}
+            icon={Bookmark}
+            loading={loading}
+          />
+          <StatCard
+            title="Completed"
+            value={stats.completed}
+            icon={Bookmark}
+            loading={loading}
+          />
         </div>
 
         {/* Bookmarks Section */}
         <div>
-          <h2 className="mb-4 text-xl font-medium">Recent Bookmarks</h2>
+          <h2 className="mb-4 text-xl font-medium">
+            {searchQuery ? `Results for "${searchQuery}"` : 'Recent Bookmarks'}
+          </h2>
 
           {loading ? (
             <div
@@ -178,18 +149,19 @@ export default function DashboardPage() {
                 </Card>
               ))}
             </div>
-          ) : filteredBookmarks.length === 0 ? (
+          ) : bookmarks.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-16">
                 <Bookmark className="mb-4 h-12 w-12 text-muted-foreground" />
-                <h3 className="mb-2 text-lg font-medium">No bookmarks yet</h3>
-                <p className="mb-4 text-sm text-muted-foreground">
-                  Start organizing your web content by adding your first bookmark
+                <h3 className="mb-2 text-lg font-medium">
+                  {searchQuery ? 'No bookmarks found' : 'No bookmarks yet'}
+                </h3>
+                <p className="mb-4 text-center text-sm text-muted-foreground">
+                  {searchQuery
+                    ? 'Try a different search term'
+                    : 'Add your first bookmark to get started'}
                 </p>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Your First Bookmark
-                </Button>
+                {!searchQuery && <AddBookmarkDialog onAdd={addBookmark} />}
               </CardContent>
             </Card>
           ) : (
@@ -198,47 +170,13 @@ export default function DashboardPage() {
                 view === 'grid' ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3' : 'space-y-4'
               }
             >
-              {filteredBookmarks.map((bookmark) => (
-                <Card key={bookmark.id} className="transition-shadow hover:shadow-md">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <CardTitle className="text-base">{bookmark.title}</CardTitle>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem>Delete</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="line-clamp-2">
-                      {bookmark.description}
-                    </CardDescription>
-                    <a
-                      href={bookmark.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 flex items-center gap-1 text-xs text-primary hover:underline"
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                      {new URL(bookmark.url).hostname}
-                    </a>
-                  </CardContent>
-                  <CardFooter className="gap-2">
-                    <Badge
-                      variant={bookmark.priority === 'high' ? 'destructive' : 'secondary'}
-                    >
-                      {bookmark.priority}
-                    </Badge>
-                    <Badge variant="outline">{bookmark.status}</Badge>
-                  </CardFooter>
-                </Card>
+              {bookmarks.map((bookmark) => (
+                <BookmarkCard
+                  key={bookmark.id}
+                  bookmark={bookmark}
+                  onEdit={editBookmark}
+                  onDelete={removeBookmark}
+                />
               ))}
             </div>
           )}

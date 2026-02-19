@@ -1,104 +1,185 @@
 'use client';
 
-import { Bookmark, ExternalLink, MoreVertical, Plus } from 'lucide-react';
-import { useState } from 'react';
-import { DashboardLayout } from '@/components/layout/dashboard-layout';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Bookmark } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-const mockBookmarks = [
-  {
-    id: '1',
-    title: 'Next.js Documentation',
-    url: 'https://nextjs.org/docs',
-    description: 'The official Next.js documentation with guides and API references',
-    priority: 'high' as const,
-    status: 'reading' as const,
-  },
-  {
-    id: '2',
-    title: 'Tailwind CSS',
-    url: 'https://tailwindcss.com',
-    description: 'A utility-first CSS framework for rapid UI development',
-    priority: 'medium' as const,
-    status: 'completed' as const,
-  },
-  {
-    id: '3',
-    title: 'shadcn/ui',
-    url: 'https://ui.shadcn.com',
-    description: 'Beautifully designed components built with Radix UI and Tailwind CSS',
-    priority: 'low' as const,
-    status: 'saved' as const,
-  },
+import { AddBookmarkDialog } from '@/components/bookmarks/add-bookmark-dialog';
+import { BookmarkCard } from '@/components/bookmarks/bookmark-card';
+import { DashboardLayout } from '@/components/layout/dashboard-layout';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useBookmarks } from '@/hooks/use-bookmarks';
+import type { Priority, Status } from '@/types';
+
+const STATUS_OPTIONS: { label: string; value: Status | 'all' }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Saved', value: 'saved' },
+  { label: 'Reading', value: 'reading' },
+  { label: 'Completed', value: 'completed' },
+];
+
+const PRIORITY_OPTIONS: { label: string; value: Priority | 'all' }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'High', value: 'high' },
+  { label: 'Medium', value: 'medium' },
+  { label: 'Low', value: 'low' },
 ];
 
 export default function BookmarksPage() {
   const [view, setView] = useState<'grid' | 'list'>('grid');
-  const [bookmarks] = useState(mockBookmarks);
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredBookmarks = bookmarks.filter(
-    (bookmark) =>
-      bookmark.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      bookmark.description.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const {
+    bookmarks,
+    loading,
+    error,
+    addBookmark,
+    editBookmark,
+    removeBookmark,
+    filters,
+    setFilters,
+  } = useBookmarks();
+
+  useEffect(() => {
+    const saved = localStorage.getItem('bookmarkView') as 'grid' | 'list' | null;
+    if (saved) setView(saved);
+  }, []);
+
+  const handleViewChange = (v: 'grid' | 'list') => {
+    setView(v);
+    localStorage.setItem('bookmarkView', v);
+  };
+
+  const handleSearchChange = (query: string) => {
+    setFilters({ ...filters, search: query || undefined });
+  };
+
+  const setStatus = (status: Status | 'all') => {
+    setFilters({ ...filters, status });
+  };
+
+  const setPriority = (priority: Priority | 'all') => {
+    setFilters({ ...filters, priority });
+  };
+
+  const activeStatus = filters.status ?? 'all';
+  const activePriority = filters.priority ?? 'all';
 
   return (
     <DashboardLayout
       currentView={view}
-      onViewChange={setView}
-      onSearchChange={setSearchQuery}
+      onViewChange={handleViewChange}
+      onSearchChange={handleSearchChange}
       showViewToggle
     >
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-semibold">All Bookmarks</h1>
             <p className="text-sm text-muted-foreground">
-              {filteredBookmarks.length} bookmark
-              {filteredBookmarks.length !== 1 ? 's' : ''} found
+              {loading
+                ? 'Loading…'
+                : `${bookmarks.length} bookmark${bookmarks.length !== 1 ? 's' : ''}`}
             </p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Bookmark
-          </Button>
+          <AddBookmarkDialog onAdd={addBookmark} />
         </div>
 
-        {/* Bookmarks */}
-        {filteredBookmarks.length === 0 ? (
+        {/* Filter Controls */}
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Status filter */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm text-muted-foreground">Status:</span>
+            <div className="flex gap-1">
+              {STATUS_OPTIONS.map((opt) => (
+                <Button
+                  key={opt.value}
+                  variant={activeStatus === opt.value ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setStatus(opt.value)}
+                  className="h-7 px-2.5 text-xs"
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Priority filter */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm text-muted-foreground">Priority:</span>
+            <div className="flex gap-1">
+              {PRIORITY_OPTIONS.map((opt) => (
+                <Button
+                  key={opt.value}
+                  variant={activePriority === opt.value ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setPriority(opt.value)}
+                  className="h-7 px-2.5 text-xs"
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Active filter badges */}
+          {(activeStatus !== 'all' || activePriority !== 'all') && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2.5 text-xs text-muted-foreground"
+              onClick={() => setFilters({})}
+            >
+              Clear filters
+            </Button>
+          )}
+        </div>
+
+        {/* Error */}
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Bookmark Grid/List */}
+        {loading ? (
+          <div
+            className={
+              view === 'grid' ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3' : 'space-y-4'
+            }
+          >
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-5 w-3/4" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="mb-2 h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : bookmarks.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16">
               <Bookmark className="mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="mb-2 text-lg font-medium">
-                {searchQuery ? 'No bookmarks found' : 'No bookmarks yet'}
+                {activeStatus !== 'all' || activePriority !== 'all' || filters.search
+                  ? 'No bookmarks match these filters'
+                  : 'No bookmarks yet'}
               </h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                {searchQuery
-                  ? 'Try adjusting your search query'
-                  : 'Start organizing your web content by adding your first bookmark'}
+              <p className="mb-4 text-center text-sm text-muted-foreground">
+                {activeStatus !== 'all' || activePriority !== 'all' || filters.search
+                  ? 'Try adjusting your filters or search query'
+                  : 'Start saving links to build your collection'}
               </p>
-              {!searchQuery && (
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Your First Bookmark
-                </Button>
+              {!filters.search && activeStatus === 'all' && activePriority === 'all' && (
+                <AddBookmarkDialog onAdd={addBookmark} />
               )}
             </CardContent>
           </Card>
@@ -108,47 +189,13 @@ export default function BookmarksPage() {
               view === 'grid' ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3' : 'space-y-4'
             }
           >
-            {filteredBookmarks.map((bookmark) => (
-              <Card key={bookmark.id} className="transition-shadow hover:shadow-md">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-base">{bookmark.title}</CardTitle>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>Delete</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="line-clamp-2">
-                    {bookmark.description}
-                  </CardDescription>
-                  <a
-                    href={bookmark.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 flex items-center gap-1 text-xs text-primary hover:underline"
-                  >
-                    <ExternalLink className="h-3 w-3" />
-                    {new URL(bookmark.url).hostname}
-                  </a>
-                </CardContent>
-                <CardFooter className="gap-2">
-                  <Badge
-                    variant={bookmark.priority === 'high' ? 'destructive' : 'secondary'}
-                  >
-                    {bookmark.priority}
-                  </Badge>
-                  <Badge variant="outline">{bookmark.status}</Badge>
-                </CardFooter>
-              </Card>
+            {bookmarks.map((bookmark) => (
+              <BookmarkCard
+                key={bookmark.id}
+                bookmark={bookmark}
+                onEdit={editBookmark}
+                onDelete={removeBookmark}
+              />
             ))}
           </div>
         )}
