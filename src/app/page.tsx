@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Bookmark, Bot, Lock, Search, Zap } from 'lucide-react';
+import { ArrowRight, Bookmark } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -14,24 +14,23 @@ import type { User } from '@supabase/supabase-js';
 
 const features = [
   {
-    icon: Bot,
     title: 'AI-Powered',
-    description: 'Local AI automatically categorizes and tags every link you save.',
+    description:
+      'Smart AI automatically categorizes, tags, and prioritizes every link you save.',
   },
   {
-    icon: Search,
-    title: 'Semantic Search',
-    description: 'Find anything instantly - search by meaning, not just keywords.',
+    title: 'Instant Search',
+    description: 'Find anything instantly with real-time, lightning-fast text filtering.',
   },
   {
-    icon: Zap,
     title: 'Instant',
-    description: 'Lightning-fast interface with zero friction saving and retrieval.',
+    description:
+      'Optimistic UI ensures zero friction. Saving and organizing feels instantaneous.',
   },
   {
-    icon: Lock,
-    title: 'Private by Default',
-    description: 'All processing runs locally. Your data never leaves your device.',
+    title: 'Private & Secure',
+    description:
+      'Protected by industry-standard Row Level Security. Only you can access your data.',
   },
 ];
 
@@ -149,17 +148,18 @@ export default function LandingPage() {
           </Button>
         </div>
 
-        <div className="mt-20 grid gap-px rounded-2xl border border-white/10 bg-white/10 p-px sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((f) => (
-            <div
-              key={f.title}
-              className="flex flex-col gap-2 rounded-[calc(1rem-1px)] bg-black/60 p-6 text-left backdrop-blur-sm"
-            >
-              <f.icon className="h-6 w-6 text-indigo-400" />
-              <p className="font-semibold text-white">{f.title}</p>
-              <p className="text-sm text-white/50">{f.description}</p>
-            </div>
-          ))}
+        <div className="mt-20 w-full max-w-7xl overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+          <div className="animate-scroll flex w-max gap-6 py-4">
+            {[...features, ...features, ...features, ...features].map((f, i) => (
+              <div
+                key={i}
+                className="flex w-[300px] flex-shrink-0 flex-col gap-2 rounded-xl border border-white/10 bg-white/5 p-6 text-left backdrop-blur-sm transition-colors hover:bg-white/10"
+              >
+                <p className="font-semibold text-white">{f.title}</p>
+                <p className="text-sm text-white/50">{f.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </WavyBackground>
 
