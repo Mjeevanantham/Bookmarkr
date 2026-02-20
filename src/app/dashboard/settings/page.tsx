@@ -1,7 +1,9 @@
 'use client';
 
-import { Loader2, Save, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+import { Loader2, Moon, Save, Sun, User } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -19,6 +21,13 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { createClient } from '@/lib/supabase/client';
 import { fetchProfile, updateProfile } from '@/services/profiles';
 import type { Profile } from '@/types';
@@ -36,6 +45,7 @@ function getInitials(name: string | null, email: string) {
 }
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -45,6 +55,12 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const init = async () => {
@@ -63,6 +79,9 @@ export default function SettingsPage() {
           setProfile(p);
           setDisplayName(p.full_name ?? user?.user_metadata?.full_name ?? '');
           setSlackWebhook(p.slack_webhook ?? '');
+          if (typeof p.email_notifications === 'boolean') {
+            setEmailNotifications(p.email_notifications);
+          }
         }
       } catch {
         // silent — user sees empty form
@@ -82,6 +101,7 @@ export default function SettingsPage() {
       const updated = await updateProfile({
         full_name: displayName.trim() || null,
         slack_webhook: slackWebhook.trim() || null,
+        email_notifications: emailNotifications,
       });
 
       setProfile(updated);
@@ -123,6 +143,7 @@ export default function SettingsPage() {
         <Tabs defaultValue="profile" className="space-y-6">
           <TabsList>
             <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="appearance">Appearance</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
           </TabsList>
@@ -173,6 +194,55 @@ export default function SettingsPage() {
                   <p className="text-xs text-muted-foreground">
                     Email is managed by your authentication provider (Google).
                   </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ── Appearance Tab ────────────────────────────────── */}
+          <TabsContent value="appearance" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Theme</CardTitle>
+                <CardDescription>
+                  Select your preferred interface theme
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label>Interface Theme</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Switch between light and dark mode.
+                    </p>
+                  </div>
+                  {mounted && (
+                    <Select value={theme} onValueChange={setTheme}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select theme" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="light">
+                          <div className="flex items-center">
+                            <Sun className="mr-2 h-4 w-4" />
+                            Light
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="dark">
+                          <div className="flex items-center">
+                            <Moon className="mr-2 h-4 w-4" />
+                            Dark
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="system">
+                          <div className="flex items-center">
+                            <Loader2 className="mr-2 h-4 w-4" />
+                            System
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
               </CardContent>
             </Card>

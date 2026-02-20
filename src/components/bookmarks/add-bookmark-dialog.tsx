@@ -1,12 +1,14 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChevronDown, ChevronUp, Loader2, Plus } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader2, Plus, Wand2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { analyzeBookmark } from '@/actions/analyze';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -53,6 +55,7 @@ export function AddBookmarkDialog({ onAdd }: AddBookmarkDialogProps) {
     handleSubmit,
     setValue,
     reset,
+    getValues,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -61,6 +64,61 @@ export function AddBookmarkDialog({ onAdd }: AddBookmarkDialogProps) {
       status: 'saved',
     },
   });
+
+  /* AI Analysis Logic */
+  const [analyzing, setAnalyzing] = useState(false);
+  const { toast } = useToast();
+
+  const handleAnalyze = async () => {
+    const url = getValues('url');
+    const title = getValues('title');
+
+    if (!url) {
+      toast({
+        title: 'URL Required',
+        description: 'Please enter a URL to analyze.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      setAnalyzing(true);
+      const result = await analyzeBookmark(url, title);
+
+      if (result) {
+        if (result.description) {
+          const tagsStr = result.tags?.length
+            ? `\n\nTags: ${result.tags.map((t) => `#${t}`).join(' ')}`
+            : '';
+          setValue('description', result.description + tagsStr);
+        }
+        if (result.priority) setValue('priority', result.priority as any);
+        if (result.status) setValue('status', result.status as any);
+
+        toast({
+          title: 'Analysis Complete',
+          description: 'Bookmark details auto-filled by AI.',
+        });
+        setShowMore(true);
+      } else {
+        toast({
+          title: 'Analysis Failed',
+          description: 'Could not generate metadata. Please fill manually.',
+          variant: 'destructive',
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: 'Error',
+        description: 'Something went wrong during analysis.',
+        variant: 'destructive',
+      });
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
   const onSubmit = async (values: FormValues) => {
     try {
@@ -101,7 +159,24 @@ export function AddBookmarkDialog({ onAdd }: AddBookmarkDialogProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* URL - Primary Input */}
           <div className="space-y-1.5">
-            <Label htmlFor="bm-url">URL</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="bm-url">URL</Label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-6 gap-1 px-2 text-xs text-indigo-500 hover:text-indigo-600"
+                onClick={handleAnalyze}
+                disabled={analyzing}
+              >
+                {analyzing ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <Wand2 className="h-3 w-3" />
+                )}
+                {analyzing ? 'Analyzing...' : 'Auto-Fill'}
+              </Button>
+            </div>
             <Input
               id="bm-url"
               placeholder="https://..."
@@ -154,7 +229,7 @@ export function AddBookmarkDialog({ onAdd }: AddBookmarkDialogProps) {
                 <Label htmlFor="bm-desc">Description</Label>
                 <Textarea
                   id="bm-desc"
-                  placeholder="Short note about this link..."
+                  placeholder="Short note (AI can fill this)..."
                   rows={2}
                   {...register('description')}
                 />

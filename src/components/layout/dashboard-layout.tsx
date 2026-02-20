@@ -124,18 +124,18 @@ export function DashboardLayout({
               <Image
                 src="/Bookmarkr_favicon.png"
                 alt="B"
-                width={32}
-                height={32}
-                className="h-8 w-8 object-contain"
+                width={40}
+                height={40}
+                className="h-10 w-10 object-contain"
               />
             ) : (
               <div className="flex w-full items-center justify-start px-2 transition-all duration-300">
                 <Image
                   src="/Bookmarkr_full_logo.png"
                   alt="Bookmarkr"
-                  width={130}
-                  height={32}
-                  className="h-7 w-auto object-contain"
+                  width={160}
+                  height={40}
+                  className="h-9 w-auto object-contain"
                 />
               </div>
             )}
@@ -144,7 +144,9 @@ export function DashboardLayout({
           <nav className="flex-1 space-y-1 p-2">
             {navigation.map((item) => {
               const isActive =
-                pathname === item.href || pathname?.startsWith(item.href + '/');
+                item.href === '/dashboard'
+                  ? pathname === '/dashboard'
+                  : pathname === item.href || pathname?.startsWith(item.href + '/');
 
               return isCollapsed ? (
                 <Tooltip key={item.name}>

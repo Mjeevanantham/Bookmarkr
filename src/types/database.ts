@@ -10,6 +10,7 @@ export interface Profile {
   full_name: string | null;
   avatar_url: string | null;
   slack_webhook: string | null;
+  email_notifications: boolean | null;
   theme: Theme;
   created_at: string;
   updated_at: string;
@@ -38,5 +39,5 @@ export type UpdateBookmarkPayload = Partial<
 >;
 
 export type UpdateProfilePayload = Partial<
-  Pick<Profile, 'full_name' | 'slack_webhook' | 'theme'>
+  Pick<Profile, 'full_name' | 'slack_webhook' | 'theme' | 'email_notifications'>
 >;
