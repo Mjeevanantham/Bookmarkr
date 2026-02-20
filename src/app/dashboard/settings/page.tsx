@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 import { Loader2, Moon, Save, Sun, User } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -18,9 +17,6 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -28,6 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createClient } from '@/lib/supabase/client';
 import { fetchProfile, updateProfile } from '@/services/profiles';
 import type { Profile } from '@/types';
@@ -204,9 +203,7 @@ export default function SettingsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Theme</CardTitle>
-                <CardDescription>
-                  Select your preferred interface theme
-                </CardDescription>
+                <CardDescription>Select your preferred interface theme</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-between">

@@ -8,7 +8,6 @@ import { z } from 'zod';
 
 import { analyzeBookmark } from '@/actions/analyze';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -28,6 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 import type { CreateBookmarkPayload } from '@/types';
 
 const schema = z.object({
@@ -93,8 +93,9 @@ export function AddBookmarkDialog({ onAdd }: AddBookmarkDialogProps) {
             : '';
           setValue('description', result.description + tagsStr);
         }
-        if (result.priority) setValue('priority', result.priority as any);
-        if (result.status) setValue('status', result.status as any);
+        if (result.priority)
+          setValue('priority', result.priority as FormValues['priority']);
+        if (result.status) setValue('status', result.status as FormValues['status']);
 
         toast({
           title: 'Analysis Complete',
