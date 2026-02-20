@@ -2,6 +2,7 @@
 
 import {
   Bookmark,
+  ChevronsLeft,
   Grid3x3,
   LayoutDashboard,
   List,
@@ -9,6 +10,7 @@ import {
   Search,
   Settings,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
@@ -24,8 +26,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import type { User } from '@supabase/supabase-js';
@@ -62,6 +69,7 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [userLoading, setUserLoading] = useState(true);
@@ -91,154 +99,200 @@ export function DashboardLayout({
   const displayName = fullName ?? email ?? 'User';
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="w-64 shrink-0 border-r bg-muted/40">
-        <div className="flex h-full flex-col">
-          {/* Logo */}
-          <div className="flex h-16 items-center gap-2 border-b px-6">
-            <Bookmark className="h-5 w-5" />
-            <span className="text-lg font-semibold">Bookmarkr</span>
+    <TooltipProvider delayDuration={0}>
+      <div className="flex min-h-screen bg-background text-foreground">
+        {/* Sidebar */}
+        <aside
+          className={cn(
+            'group relative flex flex-col border-r bg-muted/10 transition-all duration-300 ease-in-out',
+            isCollapsed ? 'w-[60px]' : 'w-64',
+          )}
+        >
+          {/* Collapse Toggle */}
+          <div
+            className={cn(
+              'absolute -right-3 top-6 z-20 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border bg-background text-foreground opacity-0 shadow-sm transition-opacity hover:bg-muted group-hover:opacity-100',
+              isCollapsed && 'rotate-180',
+            )}
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            <ChevronsLeft className="h-3 w-3" />
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 space-y-1 p-4">
+          <div className="flex h-14 items-center justify-center border-b px-3">
+            {isCollapsed ? (
+              <Image
+                src="/Bookmarkr_favicon.png"
+                alt="B"
+                width={32}
+                height={32}
+                className="h-8 w-8 object-contain"
+              />
+            ) : (
+              <div className="flex w-full items-center justify-start px-2 transition-all duration-300">
+                <Image
+                  src="/Bookmarkr_full_logo.png"
+                  alt="Bookmarkr"
+                  width={130}
+                  height={32}
+                  className="h-7 w-auto object-contain"
+                />
+              </div>
+            )}
+          </div>
+
+          <nav className="flex-1 space-y-1 p-2">
             {navigation.map((item) => {
               const isActive =
                 pathname === item.href || pathname?.startsWith(item.href + '/');
-              return (
-                <Link key={item.name} href={item.href}>
-                  <Button
-                    variant={isActive ? 'secondary' : 'ghost'}
-                    className={cn('w-full justify-start', isActive && 'bg-secondary')}
-                  >
-                    <item.icon className="mr-2 h-4 w-4" />
+
+              return isCollapsed ? (
+                <Tooltip key={item.name}>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        'flex h-9 w-9 items-center justify-center rounded-md transition-colors hover:bg-muted',
+                        isActive
+                          ? 'bg-foreground text-background hover:bg-foreground/90'
+                          : 'text-muted-foreground',
+                      )}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span className="sr-only">{item.name}</span>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="flex items-center gap-4">
                     {item.name}
-                  </Button>
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    'flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted',
+                    isActive
+                      ? 'bg-muted font-semibold text-foreground'
+                      : 'text-muted-foreground',
+                  )}
+                >
+                  <item.icon className="mr-3 h-4 w-4" />
+                  {item.name}
                 </Link>
               );
             })}
           </nav>
 
-          {/* User mini-profile + Logout */}
-          <div className="space-y-2 border-t p-4">
-            {/* User profile row */}
-            {userLoading ? (
-              <div className="flex items-center gap-3 px-2 py-1">
-                <Skeleton className="h-8 w-8 rounded-full" />
-                <div className="flex-1 space-y-1">
-                  <Skeleton className="h-3 w-24" />
-                  <Skeleton className="h-3 w-32" />
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3 rounded-lg px-2 py-1">
-                <Avatar className="h-8 w-8 shrink-0">
-                  <AvatarImage src={avatarUrl} alt={displayName} />
-                  <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{fullName ?? 'User'}</p>
-                  <p className="truncate text-xs text-muted-foreground">{email}</p>
-                </div>
-              </div>
-            )}
-
-            <Button
-              onClick={handleLogout}
-              variant="ghost"
-              className="w-full justify-start text-muted-foreground"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* Header */}
-        <header className="flex h-16 shrink-0 items-center gap-4 border-b px-6">
-          {/* Search */}
-          <div className="flex flex-1 items-center gap-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search bookmarks..."
-              value={searchValue}
-              onChange={handleSearchChange}
-              className="max-w-md border-none bg-transparent shadow-none focus-visible:ring-0"
-            />
-          </div>
-
-          {/* View Toggle */}
-          {showViewToggle && (
-            <>
-              <Separator orientation="vertical" className="h-6" />
-              <div className="flex items-center gap-1">
-                <Button
-                  variant={currentView === 'grid' ? 'secondary' : 'ghost'}
-                  size="icon"
-                  onClick={() => onViewChange?.('grid')}
-                >
-                  <Grid3x3 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={currentView === 'list' ? 'secondary' : 'ghost'}
-                  size="icon"
-                  onClick={() => onViewChange?.('list')}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            </>
-          )}
-
-          {/* User Avatar Dropdown */}
-          <Separator orientation="vertical" className="h-6" />
-          {userLoading ? (
-            <Skeleton className="h-8 w-8 rounded-full" />
-          ) : (
+          {/* User Profile (Bottom Sidebar) */}
+          <div className="border-t p-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={avatarUrl} alt={displayName} />
-                    <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-                  </Avatar>
-                </Button>
+                <div
+                  className={cn(
+                    'flex cursor-pointer items-center rounded-md p-2 transition-colors hover:bg-muted',
+                    isCollapsed ? 'justify-center' : 'gap-3',
+                  )}
+                >
+                  {userLoading ? (
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                  ) : (
+                    <Avatar className="h-8 w-8 shrink-0 border border-border/40">
+                      <AvatarImage src={avatarUrl} alt={displayName} />
+                      <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                    </Avatar>
+                  )}
+                  {!isCollapsed && !userLoading && (
+                    <div className="flex flex-1 flex-col overflow-hidden text-left">
+                      <span className="truncate text-sm font-medium leading-none">
+                        {displayName}
+                      </span>
+                      <span className="truncate text-xs text-muted-foreground">
+                        {email}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent
+                align="start"
+                side={isCollapsed ? 'right' : 'top'}
+                className="w-56"
+              >
                 <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col gap-0.5">
-                    <p className="text-sm font-semibold">{fullName ?? 'User'}</p>
-                    <p className="text-xs text-muted-foreground">{email}</p>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{displayName}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{email}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>
                   <Settings className="mr-2 h-4 w-4" />
-                  Settings
+                  <span>Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="text-destructive focus:text-destructive"
-                >
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
-                  Logout
+                  <span>Log out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
-        </header>
+          </div>
+        </aside>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-auto p-8">
-          <div className="mx-auto max-w-7xl">{children}</div>
-        </main>
+        {/* Main Content */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          {/* Header */}
+          <header className="flex h-14 items-center gap-4 bg-background px-6">
+            <div className="relative flex flex-1 items-center">
+              <Search className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                value={searchValue}
+                onChange={handleSearchChange}
+                className="h-9 w-full max-w-sm border-none bg-muted/40 pl-9 shadow-none focus-visible:ring-1 focus-visible:ring-ring sm:w-80"
+              />
+            </div>
+
+            {/* Right Actions */}
+            <div className="flex items-center gap-2">
+              {showViewToggle && (
+                <div className="flex items-center rounded-md border bg-background p-1 shadow-sm">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn(
+                      'h-7 w-7 rounded-sm',
+                      currentView === 'grid' && 'bg-muted shadow-sm',
+                    )}
+                    onClick={() => onViewChange?.('grid')}
+                  >
+                    <Grid3x3 className="h-4 w-4" />
+                    <span className="sr-only">Grid view</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn(
+                      'h-7 w-7 rounded-sm',
+                      currentView === 'list' && 'bg-muted shadow-sm',
+                    )}
+                    onClick={() => onViewChange?.('list')}
+                  >
+                    <List className="h-4 w-4" />
+                    <span className="sr-only">List view</span>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </header>
+
+          {/* Page Content */}
+          <main className="flex-1 overflow-auto p-4 md:p-8">
+            <div className="mx-auto max-w-5xl">{children}</div>
+          </main>
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }

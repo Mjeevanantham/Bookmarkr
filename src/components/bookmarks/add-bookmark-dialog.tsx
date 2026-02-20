@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Plus } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader2, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -46,6 +46,7 @@ export function AddBookmarkDialog({ onAdd }: AddBookmarkDialogProps) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showMore, setShowMore] = useState(false);
 
   const {
     register,
@@ -74,6 +75,7 @@ export function AddBookmarkDialog({ onAdd }: AddBookmarkDialogProps) {
       });
       reset();
       setOpen(false);
+      setShowMore(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add bookmark');
     } finally {
@@ -97,22 +99,14 @@ export function AddBookmarkDialog({ onAdd }: AddBookmarkDialogProps) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Title */}
-          <div className="space-y-1.5">
-            <Label htmlFor="bm-title">Title</Label>
-            <Input id="bm-title" placeholder="Next.js Docs" {...register('title')} />
-            {errors.title && (
-              <p className="text-xs text-destructive">{errors.title.message}</p>
-            )}
-          </div>
-
-          {/* URL */}
+          {/* URL - Primary Input */}
           <div className="space-y-1.5">
             <Label htmlFor="bm-url">URL</Label>
             <Input
               id="bm-url"
               placeholder="https://..."
               type="url"
+              autoFocus
               {...register('url')}
             />
             {errors.url && (
@@ -120,53 +114,92 @@ export function AddBookmarkDialog({ onAdd }: AddBookmarkDialogProps) {
             )}
           </div>
 
-          {/* Description */}
+          {/* Title */}
           <div className="space-y-1.5">
-            <Label htmlFor="bm-desc">Description (optional)</Label>
-            <Textarea
-              id="bm-desc"
-              placeholder="Short note about this link..."
-              rows={2}
-              {...register('description')}
+            <Label htmlFor="bm-title">Title</Label>
+            <Input
+              id="bm-title"
+              placeholder="e.g. Next.js Documentation"
+              {...register('title')}
             />
+            {errors.title && (
+              <p className="text-xs text-destructive">{errors.title.message}</p>
+            )}
           </div>
 
-          {/* Priority + Status row */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>Priority</Label>
-              <Select
-                defaultValue="medium"
-                onValueChange={(v) => setValue('priority', v as FormValues['priority'])}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label>Status</Label>
-              <Select
-                defaultValue="saved"
-                onValueChange={(v) => setValue('status', v as FormValues['status'])}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="saved">Saved</SelectItem>
-                  <SelectItem value="reading">Reading</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          {/* More Options Toggle */}
+          <div className="pt-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowMore(!showMore)}
+              className="flex w-full items-center justify-between px-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
+            >
+              <span className="text-xs font-semibold uppercase tracking-wider">
+                More Options
+              </span>
+              {showMore ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
           </div>
+
+          {showMore && (
+            <div className="space-y-4 duration-200 animate-in fade-in slide-in-from-top-2">
+              {/* Description */}
+              <div className="space-y-1.5">
+                <Label htmlFor="bm-desc">Description</Label>
+                <Textarea
+                  id="bm-desc"
+                  placeholder="Short note about this link..."
+                  rows={2}
+                  {...register('description')}
+                />
+              </div>
+
+              {/* Priority + Status row */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Priority</Label>
+                  <Select
+                    defaultValue="medium"
+                    onValueChange={(v) =>
+                      setValue('priority', v as FormValues['priority'])
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>Status</Label>
+                  <Select
+                    defaultValue="saved"
+                    onValueChange={(v) => setValue('status', v as FormValues['status'])}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="saved">Saved</SelectItem>
+                      <SelectItem value="reading">Reading</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 

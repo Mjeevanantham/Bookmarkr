@@ -1,6 +1,7 @@
 'use client';
 
-import { Bookmark, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,8 +37,15 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
-            <Bookmark className="h-6 w-6 text-primary-foreground" />
+          <div className="mb-6 flex justify-center">
+            <Image
+              src="/Bookmarkr_full_logo.png"
+              alt="Bookmarkr"
+              width={180}
+              height={50}
+              className="h-10 w-auto"
+              priority
+            />
           </div>
           <CardTitle className="text-2xl">Welcome back</CardTitle>
           <CardDescription>Sign in to access your bookmarks</CardDescription>

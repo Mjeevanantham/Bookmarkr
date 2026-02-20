@@ -119,23 +119,16 @@ export default function LandingPage() {
       {/* Hero - Wavy */}
       <WavyBackground
         containerClassName="min-h-screen"
-        className="flex flex-col items-center justify-center px-6 pb-20 pt-32 text-center"
-        colors={['#6366f1', '#8b5cf6', '#a855f7', '#3b82f6', '#06b6d4']}
+        className="flex h-full flex-col items-center justify-center px-6 text-center"
+        colors={['#27272a', '#3f3f46', '#52525b', '#71717a', '#a1a1aa']}
         backgroundFill="#09090b"
         blur={8}
         speed="slow"
         waveOpacity={0.4}
       >
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1 backdrop-blur-sm">
-          <Bot className="h-3.5 w-3.5 text-indigo-300" />
-          <span className="text-xs font-medium text-white/80">
-            Local-first AI · Zero data leakage
-          </span>
-        </div>
-
         <h1 className="mb-6 max-w-3xl text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
           Your bookmarks,{' '}
-          <span className="bg-gradient-to-r from-indigo-300 via-purple-300 to-cyan-300 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-white via-zinc-400 to-zinc-600 bg-clip-text text-transparent">
             finally organized.
           </span>
         </h1>
@@ -154,7 +147,6 @@ export default function LandingPage() {
             {user ? 'Go to Dashboard' : 'Start Free'}
             <ArrowRight className="h-4 w-4" />
           </Button>
-          <span className="text-sm text-white/40">No credit card required</span>
         </div>
 
         <div className="mt-20 grid gap-px rounded-2xl border border-white/10 bg-white/10 p-px sm:grid-cols-2 lg:grid-cols-4">
