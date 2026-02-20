@@ -19,7 +19,9 @@ A minimal, D2C-focused bookmark manager built with **Next.js 14**, **Supabase**,
     - "Notion-style" collapsible sidebar.
     - Minimal black-and-white aesthetic (Zinc theme).
     - Optimistic UI updates for instant feedback.
-6.  **Responsive Layout**: Fully functional on desktop and mobile.
+6.  **AI-Powered Metadata**: Auto-generate tags, descriptions, priority, and status using Google Gemini AI.
+7.  **Theme Customization**: Full support for Light, Dark, and System themes.
+8.  **Responsive Layout**: Fully functional on desktop and mobile.
 
 ## 🛠 Tech Stack
 
@@ -75,6 +77,7 @@ During development, we encountered and solved several key challenges to ensure a
     NEXT_PUBLIC_SUPABASE_URL=your_project_url
     NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
     NEXT_PUBLIC_APP_URL=http://localhost:3000
+    GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_keys
     ```
 
 4.  **Reset Database (Crucial)**:
