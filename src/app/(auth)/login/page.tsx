@@ -11,24 +11,19 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { createClient } from '@/lib/supabase/client';
+import { useGoogleSignInPopup } from '@/hooks/use-google-signin-popup';
 
 export default function LoginPage() {
+  const { signInWithPopup } = useGoogleSignInPopup();
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
 
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-      if (error) throw error;
+      await signInWithPopup();
     } catch (error) {
       console.error('Error logging in with Google:', error);
+    } finally {
       setLoading(false);
     }
   };

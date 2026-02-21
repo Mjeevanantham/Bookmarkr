@@ -10,7 +10,9 @@ export async function GET(request: Request) {
     const supabase = createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      // Redirect to success page - handles both popup (notifies opener, closes) and normal redirect
+      const successUrl = `${origin}/auth/success?next=${encodeURIComponent(next)}`;
+      return NextResponse.redirect(successUrl);
     }
   }
 

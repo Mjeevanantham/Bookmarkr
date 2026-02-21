@@ -174,3 +174,11 @@ SELECT
   (raw_user_meta_data->>'avatar_url')::text
 FROM auth.users
 ON CONFLICT (id) DO NOTHING;
+
+-- =====================================================
+-- 12. ENABLE REALTIME FOR MULTI-TAB SYNC
+-- =====================================================
+-- Required for useBookmarks realtime subscription to work across tabs.
+-- Run in Supabase SQL Editor if bookmarks table exists but sync is unreliable:
+--   ALTER PUBLICATION supabase_realtime ADD TABLE public.bookmarks;
+-- (Skip if you get "relation already member of publication")

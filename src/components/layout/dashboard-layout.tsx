@@ -76,11 +76,27 @@ export function DashboardLayout({
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    const init = async () => {
+      const { data } = await supabase.auth.getUser();
       setUser(data.user);
       setUserLoading(false);
+    };
+    init();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
     });
+    return () => subscription.unsubscribe();
   }, [supabase]);
+
+  // Redirect to login when session is invalid (e.g. cookies cleared, undefined user)
+  useEffect(() => {
+    if (!userLoading && !user) {
+      router.replace('/login');
+    }
+  }, [userLoading, user, router]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

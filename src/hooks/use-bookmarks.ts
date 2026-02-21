@@ -73,6 +73,10 @@ export function useBookmarks(initialFilters: BookmarkFilters = {}): UseBookmarks
   }, [load, filters]); // Re-fetch when filters change
 
   // Realtime subscription — multi-tab sync
+  // Uses stable load ref to avoid re-subscribing; ensure bookmarks table is in supabase_realtime publication
+  const loadRef = useRef(load);
+  loadRef.current = load;
+
   useEffect(() => {
     const supabase = createClient();
 
@@ -82,16 +86,21 @@ export function useBookmarks(initialFilters: BookmarkFilters = {}): UseBookmarks
         'postgres_changes',
         { event: '*', schema: 'public', table: 'bookmarks' },
         () => {
-          // Re-fetch on any remote change (insert/update/delete from another tab)
-          load();
+          loadRef.current();
         },
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') {
+          console.warn(
+            'Bookmarkr: Realtime subscription failed. Ensure "public.bookmarks" is in supabase_realtime publication. Run: ALTER PUBLICATION supabase_realtime ADD TABLE public.bookmarks;'
+          );
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [load]);
+  }, []);
 
   // ── Mutations ──────────────────────────────────────────────
 
