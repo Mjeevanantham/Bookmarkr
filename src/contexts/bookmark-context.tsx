@@ -154,14 +154,17 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
 
     try {
       const created = await createBookmark(payload);
-      setBookmarks((prev) => prev.map((b) => (b.id === tempId ? created : b)));
-      setStats((prev) => ({
-        ...prev,
-        highPriority:
-          created.priority === 'high' ? prev.highPriority + 1 : prev.highPriority,
-        reading: created.status === 'reading' ? prev.reading + 1 : prev.reading,
-        completed: created.status === 'completed' ? prev.completed + 1 : prev.completed,
-      }));
+      setBookmarks((prev) => {
+        const hasTemp = prev.some((b) => b.id === tempId);
+        if (hasTemp) {
+          return prev.map((b) => (b.id === tempId ? created : b));
+        }
+        const alreadyHas = prev.some((b) => b.id === created.id);
+        if (alreadyHas) return prev;
+        return [created, ...prev];
+      });
+      const newStats = await fetchBookmarkStats();
+      setStats(newStats);
     } catch (err) {
       setBookmarks((prev) => prev.filter((b) => b.id !== tempId));
       setStats((prev) => ({ ...prev, total: prev.total - 1 }));
