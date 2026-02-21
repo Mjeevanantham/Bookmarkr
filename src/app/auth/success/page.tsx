@@ -1,10 +1,9 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 
-const AUTH_SUCCESS_MESSAGE = 'BOOKMARKR_AUTH_SUCCESS';
+import { AUTH_SUCCESS_MESSAGE } from '@/lib/constants';
 
 export default function AuthSuccessPage() {
   const searchParams = useSearchParams();
@@ -14,7 +13,10 @@ export default function AuthSuccessPage() {
   useEffect(() => {
     // If opened in a popup (has opener), notify parent and close
     if (typeof window !== 'undefined' && window.opener) {
-      window.opener.postMessage({ type: AUTH_SUCCESS_MESSAGE, next }, window.location.origin);
+      window.opener.postMessage(
+        { type: AUTH_SUCCESS_MESSAGE, next },
+        window.location.origin,
+      );
       window.close();
       return;
     }
@@ -29,5 +31,3 @@ export default function AuthSuccessPage() {
     </div>
   );
 }
-
-export { AUTH_SUCCESS_MESSAGE };

@@ -1,9 +1,10 @@
 'use client';
 
-import { useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
+
+import { AUTH_SUCCESS_MESSAGE } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/client';
-import { AUTH_SUCCESS_MESSAGE } from '@/app/auth/success/page';
 
 export function useGoogleSignInPopup() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export function useGoogleSignInPopup() {
       const popup = window.open(
         data.url,
         'oauth-popup',
-        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
+        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`,
       );
 
       return new Promise<void>((resolve, reject) => {
