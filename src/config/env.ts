@@ -6,6 +6,8 @@ const envSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional(),
+  SLACK_BOT_TOKEN: z.string().optional(),
+  SLACK_WEBHOOK_URL: z.string().url().optional(),
 });
 
 // Use placeholders during build when env vars are not set (e.g. CI)
@@ -17,6 +19,8 @@ const _env = envSchema.safeParse({
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
   GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  SLACK_BOT_TOKEN: process.env.SLACK_BOT_TOKEN,
+  SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL || undefined,
 });
 
 if (!_env.success) {

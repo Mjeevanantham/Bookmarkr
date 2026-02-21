@@ -9,7 +9,7 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useBookmarks } from '@/hooks/use-bookmarks';
+import { useBookmarkContext } from '@/contexts/bookmark-context';
 
 function StatCard({
   title,
@@ -52,7 +52,8 @@ export default function DashboardPage() {
     editBookmark,
     removeBookmark,
     setFilters,
-  } = useBookmarks();
+    realtimeConnected,
+  } = useBookmarkContext();
 
   // Persist view preference
   useEffect(() => {
@@ -81,7 +82,18 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-semibold">Dashboard</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-semibold">Dashboard</h1>
+              {realtimeConnected && (
+                <span
+                  className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400"
+                  title="Real-time sync active"
+                >
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                  Live
+                </span>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">
               Manage and organize your bookmarks
             </p>

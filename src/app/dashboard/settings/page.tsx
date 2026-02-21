@@ -300,7 +300,16 @@ export default function SettingsPage() {
                     disabled={loading}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Create a webhook in your Slack app settings and paste the URL here.
+                    Create a webhook at{' '}
+                    <a
+                      href="https://api.slack.com/apps"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline hover:no-underline"
+                    >
+                      api.slack.com/apps
+                    </a>{' '}
+                    → Incoming Webhooks. See docs/SLACK_SETUP.md for full steps.
                   </p>
                 </div>
               </CardContent>

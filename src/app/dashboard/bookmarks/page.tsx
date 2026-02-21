@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useBookmarks } from '@/hooks/use-bookmarks';
+import { useBookmarkContext } from '@/contexts/bookmark-context';
 import type { Priority, Status } from '@/types';
 
 const STATUS_OPTIONS: { label: string; value: Status | 'all' }[] = [
@@ -39,7 +39,8 @@ export default function BookmarksPage() {
     removeBookmark,
     filters,
     setFilters,
-  } = useBookmarks();
+    realtimeConnected,
+  } = useBookmarkContext();
 
   useEffect(() => {
     const saved = localStorage.getItem('bookmarkView') as 'grid' | 'list' | null;
@@ -77,7 +78,18 @@ export default function BookmarksPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-semibold">All Bookmarks</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-semibold">All Bookmarks</h1>
+              {realtimeConnected && (
+                <span
+                  className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400"
+                  title="Real-time sync active"
+                >
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                  Live
+                </span>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">
               {loading
                 ? 'Loading…'
