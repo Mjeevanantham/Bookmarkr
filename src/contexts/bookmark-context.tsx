@@ -163,8 +163,12 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
         if (alreadyHas) return prev;
         return [created, ...prev];
       });
-      const newStats = await fetchBookmarkStats();
-      setStats(newStats);
+      try {
+        const newStats = await fetchBookmarkStats();
+        setStats(newStats);
+      } catch {
+        // Stats fetch failed; bookmark was created. Stats will refresh on next load/realtime.
+      }
     } catch (err) {
       setBookmarks((prev) => prev.filter((b) => b.id !== tempId));
       setStats((prev) => ({ ...prev, total: prev.total - 1 }));
